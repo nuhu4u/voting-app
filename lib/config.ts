@@ -2,7 +2,7 @@ import { AppConfig } from '@/types/common';
 
 // App configuration
 export const config: AppConfig = {
-  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3001/api',
+  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.6:3001/api',
   blockchainNetwork: process.env.EXPO_PUBLIC_BLOCKCHAIN_NETWORK || 'localhost',
   appVersion: '1.0.0',
   environment: (process.env.EXPO_PUBLIC_ENVIRONMENT as 'development' | 'staging' | 'production') || 'development',
@@ -30,7 +30,7 @@ export const apiConfig = {
 // Blockchain configuration
 export const blockchainConfig = {
   network: config.blockchainNetwork,
-  rpcUrl: process.env.EXPO_PUBLIC_RPC_URL || 'http://localhost:8545',
+  rpcUrl: process.env.EXPO_PUBLIC_RPC_URL || 'http://172.20.10.6:8545',
   chainId: parseInt(process.env.EXPO_PUBLIC_CHAIN_ID || '1337'),
   gasLimit: 300000,
   gasPrice: '20000000000', // 20 gwei

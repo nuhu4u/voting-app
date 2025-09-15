@@ -14,7 +14,7 @@ export default function TabLayout() {
         options={{
           title: 'Elections',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="ballot" size={size} color={color} />
+            <Ionicons name="document-text" size={size} color={color} />
           ),
         }}
       />
