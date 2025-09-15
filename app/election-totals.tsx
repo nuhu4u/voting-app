@@ -1,56 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 export default function ElectionTotalsScreen() {
-  const [elections, setElections] = useState<any[]>([]);
+  const [voters, setVoters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
 
   useEffect(() => {
     // Mock data - will be replaced with API calls
     setTimeout(() => {
-      setElections([
+      setVoters([
         {
-          id: '1',
-          title: 'Senatorial Election 2025',
-          election_type: 'SENATORIAL',
-          status: 'ONGOING',
-          total_votes: 1250,
-          total_voters: 5000,
-          contestants: [
-            { name: 'Adebayo Ogundimu', party: 'APC', votes: 450 },
-            { name: 'Sarah Johnson', party: 'PDP', votes: 380 },
-            { name: 'Michael Adebayo', party: 'LP', votes: 250 },
-            { name: 'Fatima Ibrahim', party: 'NNPP', votes: 170 }
-          ]
+          id: '68b0c872dec9c31503399802',
+          voterId: '68b0c872dec9c31503399802',
+          voterName: 'N/A',
+          email: 'N/A',
+          voteTime: '9/12/2025, 9:38:11 PM',
+          transactionHash: '0x6fdce54b7b1b820f7396956b2ea98305c66a96ca4c31d7911281d718d2fb887d',
+          status: 'Verified'
         },
         {
-          id: '2',
-          title: 'Governorship Election 2025',
-          election_type: 'GUBERNATORIAL',
-          status: 'ONGOING',
-          total_votes: 3200,
-          total_voters: 8000,
-          contestants: [
-            { name: 'John Doe', party: 'APC', votes: 1200 },
-            { name: 'Jane Smith', party: 'PDP', votes: 1100 },
-            { name: 'Bob Wilson', party: 'LP', votes: 600 },
-            { name: 'Alice Brown', party: 'NNPP', votes: 300 }
-          ]
+          id: '68bd515ae17da688856ddf12',
+          voterId: '68bd515ae17da688856ddf12',
+          voterName: 'N/A',
+          email: 'N/A',
+          voteTime: '9/12/2025, 9:39:37 PM',
+          transactionHash: '0x8d7885e4fd22a30a3aa7933e94bb67272869e8e3df6595a70931126ea3551e60',
+          status: 'Verified'
+        },
+        {
+          id: '68b119abeb55a9c172b95986',
+          voterId: '68b119abeb55a9c172b95986',
+          voterName: 'N/A',
+          email: 'N/A',
+          voteTime: '9/12/2025, 10:23:04 PM',
+          transactionHash: '0x84099c111fe09fbb2bfdad842e50de357e7998d5cde3e4409914635a4ddbec05',
+          status: 'Verified'
         }
       ]);
       setLoading(false);
     }, 1000);
   }, []);
 
-  const overallStats = {
-    totalElections: elections.length,
-    totalVotesCast: elections.reduce((sum, e) => sum + (e.total_votes || 0), 0),
-    totalVoters: elections.reduce((sum, e) => sum + (e.total_voters || 0), 0),
-    averageTurnout: elections.length > 0 ? 
-      (elections.reduce((sum, e) => sum + (e.total_votes || 0), 0) / elections.reduce((sum, e) => sum + (e.total_voters || 0), 0) * 100).toFixed(1) : 0
+  const electionStats = {
+    totalVotes: 3,
+    candidates: 4,
+    blockchainStatus: 'Deployed',
+    verifiedVotes: 100
   };
+
+  const filteredVoters = voters.filter(voter => 
+    voter.voterId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    voter.voterName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    voter.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -67,11 +73,11 @@ export default function ElectionTotalsScreen() {
           
           <View style={styles.headerCenter}>
             <View style={styles.headerIcon}>
-              <Ionicons name="bar-chart" size={24} color="#16a34a" />
+              <Ionicons name="checkmark-circle" size={24} color="#16a34a" />
             </View>
             <View>
-              <Text style={styles.headerTitle}>Election Totals</Text>
-              <Text style={styles.headerSubtitle}>Comprehensive vote counts and election statistics</Text>
+              <Text style={styles.headerTitle}>Total for Each Election</Text>
+              <Text style={styles.headerSubtitle}>View voter details and election totals</Text>
             </View>
           </View>
 
@@ -85,117 +91,119 @@ export default function ElectionTotalsScreen() {
         </View>
       </View>
 
-      {/* Overall Statistics */}
-      <View style={styles.overallStats}>
-        <Text style={styles.overallStatsTitle}>Overall Election Statistics</Text>
+      {/* Election Summary Card */}
+      <View style={styles.electionSummary}>
+        <View style={styles.electionSummaryHeader}>
+          <View>
+            <Text style={styles.electionTitle}>Governorship Election 2025</Text>
+            <Text style={styles.electionSubtitle}>Governorship • 4 candidates</Text>
+          </View>
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>ONGOING</Text>
+          </View>
+        </View>
         
-        <View style={styles.overallStatsGrid}>
-          <View style={styles.overallStatCard}>
-            <Ionicons name="ballot" size={24} color="#2563eb" />
-            <Text style={styles.overallStatValue}>{overallStats.totalElections}</Text>
-            <Text style={styles.overallStatLabel}>Total Elections</Text>
+        <View style={styles.electionStatsGrid}>
+          <View style={styles.electionStatCard}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <Text style={styles.electionStatValue}>{electionStats.totalVotes}</Text>
+            <Text style={styles.electionStatLabel}>Total Votes</Text>
           </View>
           
-          <View style={styles.overallStatCard}>
-            <Ionicons name="people" size={24} color="#16a34a" />
-            <Text style={styles.overallStatValue}>{overallStats.totalVoters.toLocaleString()}</Text>
-            <Text style={styles.overallStatLabel}>Total Voters</Text>
+          <View style={styles.electionStatCard}>
+            <Ionicons name="people" size={20} color="#2563eb" />
+            <Text style={styles.electionStatValue}>{electionStats.candidates}</Text>
+            <Text style={styles.electionStatLabel}>Candidates</Text>
           </View>
           
-          <View style={styles.overallStatCard}>
-            <Ionicons name="checkmark-circle" size={24} color="#ea580c" />
-            <Text style={styles.overallStatValue}>{overallStats.totalVotesCast.toLocaleString()}</Text>
-            <Text style={styles.overallStatLabel}>Votes Cast</Text>
+          <View style={styles.electionStatCard}>
+            <Ionicons name="server" size={20} color="#9333ea" />
+            <Text style={styles.electionStatValue}>{electionStats.blockchainStatus}</Text>
+            <Text style={styles.electionStatLabel}>Blockchain Status</Text>
           </View>
           
-          <View style={styles.overallStatCard}>
-            <Ionicons name="trending-up" size={24} color="#9333ea" />
-            <Text style={styles.overallStatValue}>{overallStats.averageTurnout}%</Text>
-            <Text style={styles.overallStatLabel}>Average Turnout</Text>
+          <View style={styles.electionStatCard}>
+            <Ionicons name="checkmark-circle" size={20} color="#16a34a" />
+            <Text style={styles.electionStatValue}>{electionStats.verifiedVotes}%</Text>
+            <Text style={styles.electionStatLabel}>Verified Votes</Text>
           </View>
         </View>
       </View>
 
-      {/* Elections List */}
-      <View style={styles.electionsSection}>
-        <Text style={styles.electionsTitle}>Election Breakdown</Text>
+      {/* Search Voters Section */}
+      <View style={styles.searchSection}>
+        <View style={styles.searchHeader}>
+          <Ionicons name="search" size={20} color="#1e293b" />
+          <Text style={styles.searchTitle}>Search Voters</Text>
+        </View>
+        <Text style={styles.searchDescription}>Search for specific voters by voter ID, name, or email</Text>
+        
+        <View style={styles.searchInputContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Enter voter ID, name, or email..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholderTextColor="#64748b"
+          />
+          <TouchableOpacity style={styles.showAllButton}>
+            <Text style={styles.showAllButtonText}>Show All</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Voter Details Section */}
+      <View style={styles.voterDetailsSection}>
+        <View style={styles.voterDetailsHeader}>
+          <Text style={styles.voterDetailsTitle}>Voter Details</Text>
+          <Text style={styles.voterDetailsCount}>{filteredVoters.length} total voters</Text>
+        </View>
         
         {loading ? (
           <View style={styles.loadingContainer}>
             <Ionicons name="refresh" size={32} color="#64748b" style={styles.spinningIcon} />
-            <Text style={styles.loadingText}>Loading election totals...</Text>
+            <Text style={styles.loadingText}>Loading voter details...</Text>
           </View>
         ) : (
-          <View style={styles.electionsList}>
-            {elections.map((election) => {
-              const turnout = election.total_voters > 0 ? 
-                ((election.total_votes / election.total_voters) * 100).toFixed(1) : 0;
-              const nonVoters = election.total_voters - election.total_votes;
-              
-              return (
-                <View key={election.id} style={styles.electionCard}>
-                  <View style={styles.electionHeader}>
-                    <Text style={styles.electionTitle}>{election.title}</Text>
-                    <View style={[
-                      styles.statusBadge,
-                      election.status === 'ONGOING' ? styles.statusOngoing : styles.statusCompleted
-                    ]}>
-                      <Text style={styles.statusText}>{election.status}</Text>
+          <View style={styles.votersList}>
+            {filteredVoters.map((voter) => (
+              <View key={voter.id} style={styles.voterCard}>
+                <View style={styles.voterInfo}>
+                  <View style={styles.voterIdContainer}>
+                    <Text style={styles.voterIdLabel}>Voter ID:</Text>
+                    <Text style={styles.voterIdValue}>{voter.voterId}</Text>
+                  </View>
+                  
+                  <View style={styles.voterDetailsRow}>
+                    <View style={styles.voterDetailItem}>
+                      <Text style={styles.voterDetailLabel}>Voter Name:</Text>
+                      <Text style={styles.voterDetailValue}>{voter.voterName}</Text>
+                    </View>
+                    <View style={styles.voterDetailItem}>
+                      <Text style={styles.voterDetailLabel}>Email:</Text>
+                      <Text style={styles.voterDetailValue}>{voter.email}</Text>
                     </View>
                   </View>
                   
-                  <View style={styles.electionStats}>
-                    <View style={styles.statRow}>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Total Voters</Text>
-                        <Text style={styles.statValue}>{election.total_voters.toLocaleString()}</Text>
-                      </View>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Votes Cast</Text>
-                        <Text style={styles.statValue}>{election.total_votes.toLocaleString()}</Text>
-                      </View>
+                  <View style={styles.voterDetailsRow}>
+                    <View style={styles.voterDetailItem}>
+                      <Text style={styles.voterDetailLabel}>Vote Time:</Text>
+                      <Text style={styles.voterDetailValue}>{voter.voteTime}</Text>
                     </View>
-                    
-                    <View style={styles.statRow}>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Non-Voters</Text>
-                        <Text style={styles.statValue}>{nonVoters.toLocaleString()}</Text>
-                      </View>
-                      <View style={styles.statItem}>
-                        <Text style={styles.statLabel}>Turnout</Text>
-                        <Text style={styles.statValue}>{turnout}%</Text>
-                      </View>
+                    <View style={styles.voterDetailItem}>
+                      <Text style={styles.voterDetailLabel}>Transaction Hash:</Text>
+                      <Text style={styles.voterDetailValue}>{voter.transactionHash}</Text>
                     </View>
-                  </View>
-                  
-                  <View style={styles.candidatesSection}>
-                    <Text style={styles.candidatesTitle}>Candidate Results</Text>
-                    {election.contestants.map((candidate, index) => {
-                      const percentage = election.total_votes > 0 ? 
-                        ((candidate.votes / election.total_votes) * 100).toFixed(1) : 0;
-                      
-                      return (
-                        <View key={index} style={styles.candidateRow}>
-                          <View style={styles.candidateInfo}>
-                            <View style={styles.candidateRank}>
-                              <Text style={styles.candidateRankText}>{index + 1}</Text>
-                            </View>
-                            <View style={styles.candidateDetails}>
-                              <Text style={styles.candidateName}>{candidate.name}</Text>
-                              <Text style={styles.candidateParty}>{candidate.party}</Text>
-                            </View>
-                          </View>
-                          <View style={styles.candidateStats}>
-                            <Text style={styles.candidateVotes}>{candidate.votes.toLocaleString()}</Text>
-                            <Text style={styles.candidatePercentage}>{percentage}%</Text>
-                          </View>
-                        </View>
-                      );
-                    })}
                   </View>
                 </View>
-              );
-            })}
+                
+                <View style={styles.voterStatus}>
+                  <View style={styles.verifiedBadge}>
+                    <Text style={styles.verifiedText}>Verified</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
           </View>
         )}
       </View>
@@ -253,7 +261,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'center',
   },
-  overallStats: {
+  electionSummary: {
     backgroundColor: 'white',
     margin: 12,
     padding: 16,
@@ -261,46 +269,126 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e8f0',
   },
-  overallStatsTitle: {
+  electionSummaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  electionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginBottom: 12,
-    textAlign: 'center',
+    marginBottom: 4,
   },
-  overallStatsGrid: {
+  electionSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  statusBadge: {
+    backgroundColor: '#dcfce7',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  statusText: {
+    fontSize: 12,
+    color: '#166534',
+    fontWeight: '600',
+  },
+  electionStatsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  overallStatCard: {
+  electionStatCard: {
     width: '48%',
     alignItems: 'center',
     padding: 12,
     backgroundColor: '#f8fafc',
-    borderRadius: 12,
+    borderRadius: 8,
     marginBottom: 8,
   },
-  overallStatValue: {
-    fontSize: 20,
+  electionStatValue: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginTop: 6,
+    marginTop: 4,
   },
-  overallStatLabel: {
+  electionStatLabel: {
     fontSize: 10,
     color: '#64748b',
     marginTop: 2,
     textAlign: 'center',
   },
-  electionsSection: {
+  searchSection: {
+    backgroundColor: 'white',
     margin: 12,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
-  electionsTitle: {
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  searchTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#1e293b',
+    marginLeft: 8,
+  },
+  searchDescription: {
+    fontSize: 12,
+    color: '#64748b',
     marginBottom: 12,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  searchInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 12,
+    color: '#1e293b',
+    backgroundColor: '#f9fafb',
+  },
+  showAllButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  showAllButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  voterDetailsSection: {
+    margin: 12,
+  },
+  voterDetailsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  voterDetailsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  voterDetailsCount: {
+    fontSize: 12,
+    color: '#64748b',
   },
   loadingContainer: {
     alignItems: 'center',
@@ -314,133 +402,67 @@ const styles = StyleSheet.create({
   spinningIcon: {
     transform: [{ rotate: '360deg' }],
   },
-  electionsList: {
-    gap: 16,
+  votersList: {
+    gap: 12,
   },
-  electionCard: {
+  voterCard: {
     backgroundColor: 'white',
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
     borderColor: '#e2e8f0',
-    marginBottom: 12,
-  },
-  electionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start',
   },
-  electionTitle: {
-    fontSize: 14,
+  voterInfo: {
+    flex: 1,
+  },
+  voterIdContainer: {
+    marginBottom: 8,
+  },
+  voterIdLabel: {
+    fontSize: 10,
+    color: '#64748b',
+    marginBottom: 2,
+  },
+  voterIdValue: {
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#1e293b',
-    flex: 1,
+    fontFamily: 'monospace',
   },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  statusOngoing: {
-    backgroundColor: '#dcfce7',
-  },
-  statusCompleted: {
-    backgroundColor: '#f3f4f6',
-  },
-  statusText: {
-    fontSize: 12,
-    color: '#166534',
-    fontWeight: '600',
-  },
-  electionStats: {
-    marginBottom: 16,
-  },
-  statRow: {
+  voterDetailsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 6,
   },
-  statItem: {
+  voterDetailItem: {
     flex: 1,
-    alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#f8fafc',
-    borderRadius: 8,
-    marginHorizontal: 4,
+    marginRight: 8,
   },
-  statLabel: {
-    fontSize: 12,
+  voterDetailLabel: {
+    fontSize: 10,
     color: '#64748b',
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  statValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  voterDetailValue: {
+    fontSize: 11,
     color: '#1e293b',
+    fontFamily: 'monospace',
+    lineHeight: 14,
   },
-  candidatesSection: {
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
-    paddingTop: 16,
-  },
-  candidatesTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 12,
-  },
-  candidateRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
-  },
-  candidateInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  candidateRank: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#e2e8f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  candidateRankText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#64748b',
-  },
-  candidateDetails: {
-    flex: 1,
-  },
-  candidateName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-  },
-  candidateParty: {
-    fontSize: 12,
-    color: '#64748b',
-    marginTop: 2,
-  },
-  candidateStats: {
+  voterStatus: {
     alignItems: 'flex-end',
   },
-  candidateVotes: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1e293b',
+  verifiedBadge: {
+    backgroundColor: '#dcfce7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  candidatePercentage: {
-    fontSize: 12,
-    color: '#64748b',
-    marginTop: 2,
+  verifiedText: {
+    fontSize: 10,
+    color: '#166534',
+    fontWeight: '600',
   },
 });
