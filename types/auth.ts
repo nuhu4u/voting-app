@@ -39,8 +39,18 @@ export interface RegisterData {
   password: string;
   first_name: string;
   last_name: string;
-  nin: string;
-  phone: string;
+  phone_number?: string;
+  date_of_birth?: string;
+  gender?: string;
+  address?: string;
+  // State of Origin
+  state_of_origin_id?: string;
+  lga_of_origin_id?: string;
+  // State of Residence
+  state_id?: string;
+  lga_id?: string;
+  ward_id?: string;
+  polling_unit_id?: string;
 }
 
 export interface AuthResponse {

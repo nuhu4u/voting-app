@@ -209,8 +209,8 @@ export default function BlockchainTransactionsScreen() {
                     <Text style={styles.footerLabel}>Status:</Text>
                     <Text style={[styles.footerValue, styles.statusVerified]}>{transaction.status}</Text>
                   </View>
-                </View>
-              </View>
+      </View>
+    </View>
             ))}
           </View>
         )}
