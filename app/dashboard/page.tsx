@@ -789,7 +789,7 @@ export default function DashboardScreen() {
             onPress={() => setActiveTab('elections')}
           >
             <Ionicons 
-              name="ballot-outline" 
+              name="ballot" 
               size={18} 
               color={activeTab === 'elections' ? '#3b82f6' : '#64748b'} 
             />
@@ -834,7 +834,7 @@ export default function DashboardScreen() {
             </View>
             {elections.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="ballot-outline" size={48} color="#9ca3af" />
+                <Ionicons name="ballot" size={48} color="#9ca3af" />
                 <Text style={styles.emptyTitle}>No Active Elections</Text>
                 <Text style={styles.emptyText}>There are currently no elections available for voting.</Text>
               </View>

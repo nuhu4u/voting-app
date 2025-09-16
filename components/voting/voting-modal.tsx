@@ -138,7 +138,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001/api'}/elections/${election.id}/vote`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://10.226.155.194:3001/api'}/elections/${election.id}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
