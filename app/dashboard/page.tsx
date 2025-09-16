@@ -16,6 +16,7 @@ import { dashboardService, DashboardData, Election as APIElection, Vote } from '
 import { ApiConfigModal } from '@/components/common/ApiConfigModal';
 import { VoteHistoryList } from '@/components/dashboard/vote-history-list';
 import { useVoteHistory } from '@/hooks/use-vote-history';
+import { VotingModal } from '@/components/voting/voting-modal';
 
 interface VoterInfo {
   name: string;
@@ -63,6 +64,10 @@ export default function DashboardScreen() {
   
   // Active tab state
   const [activeTab, setActiveTab] = useState<'elections' | 'results' | 'history'>('elections');
+  
+  // Voting modal state
+  const [showVotingModal, setShowVotingModal] = useState(false);
+  const [selectedElection, setSelectedElection] = useState<APIElection | null>(null);
   
   // Data states
   const [loading, setLoading] = useState(true);
@@ -230,6 +235,17 @@ export default function DashboardScreen() {
       
       if (response.success && response.data) {
         const data = response.data;
+        console.log('📊 Dashboard: Full data object:', JSON.stringify(data, null, 2));
+        
+        // Debug elections data
+        if (data.elections) {
+          console.log('📊 Dashboard: Elections count:', data.elections.length);
+          data.elections.forEach((election: any, index: number) => {
+            console.log(`📊 Dashboard: Election ${index}:`, election.title);
+            console.log(`📊 Dashboard: Election ${index} contestants:`, election.contestants);
+            console.log(`📊 Dashboard: Election ${index} contestants length:`, election.contestants?.length || 0);
+          });
+        }
         
         // Set voter info
         if (data.voterInfo) {
@@ -816,7 +832,17 @@ export default function DashboardScreen() {
                   Cast your vote for the {election.type.toLowerCase()} election. You can vote for one candidate per election.
                 </Text>
                 
-                <TouchableOpacity style={styles.voteButton}>
+                <TouchableOpacity 
+                  style={styles.voteButton}
+                  onPress={() => {
+                    console.log('🗳️ Dashboard: Cast vote button pressed for election:', election);
+                    console.log('🗳️ Dashboard: Election contestants:', election.contestants);
+                    console.log('🗳️ Dashboard: Setting showVotingModal to true');
+                    setSelectedElection(election);
+                    setShowVotingModal(true);
+                    console.log('🗳️ Dashboard: showVotingModal should now be true');
+                  }}
+                >
                   <Ionicons name="checkmark-circle" size={16} color="white" />
                   <Text style={styles.voteButtonText}>Cast Your Vote</Text>
                 </TouchableOpacity>
@@ -903,6 +929,18 @@ export default function DashboardScreen() {
           console.log('📊 Dashboard: API URL changed to:', newUrl);
           // Reload dashboard data with new API URL
           loadDashboardData();
+        }}
+      />
+      
+      {/* Voting Modal */}
+      <VotingModal
+        isOpen={showVotingModal}
+        onClose={() => setShowVotingModal(false)}
+        election={selectedElection}
+        voterInfo={voterInfo}
+        onVoteSuccess={() => {
+          setShowVotingModal(false);
+          handleRefresh();
         }}
       />
     </View>

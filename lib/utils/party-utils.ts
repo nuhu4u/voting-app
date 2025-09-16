@@ -15,13 +15,15 @@ export interface CandidateDetails {
   votes: number
 }
 
+const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001';
+
 export const STATIC_CANDIDATES: CandidateDetails[] = [
   {
     id: "candidate-1",
     name: "Adebayo Ogundimu",
     party: "All Progressives Congress (APC)",
     partyAcronym: "APC",
-    partyPicture: "/party-logos/apc.webp",
+    partyPicture: `${baseUrl}/party-logos/apc.webp`,
     age: 58,
     qualification: "PhD Political Science, Former Governor",
     runningMate: "Dr. Fatima Abdullahi",
@@ -36,7 +38,7 @@ export const STATIC_CANDIDATES: CandidateDetails[] = [
     name: "Chinedu Okwu",
     party: "Peoples Democratic Party (PDP)",
     partyAcronym: "PDP",
-    partyPicture: "/party-logos/pdp.webp",
+    partyPicture: `${baseUrl}/party-logos/pdp.webp`,
     age: 62,
     qualification: "LLB, Former Senator",
     runningMate: "Prof. Amina Hassan",
@@ -51,7 +53,7 @@ export const STATIC_CANDIDATES: CandidateDetails[] = [
     name: "Ibrahim Musa", 
     party: "Labour Party (LP)",
     partyAcronym: "LP",
-    partyPicture: "/party-logos/labour-party.jpg",
+    partyPicture: `${baseUrl}/party-logos/labour-party.jpg`,
     age: 55,
     qualification: "MBA, Business Executive",
     runningMate: "Mrs. Grace Okafor",
@@ -66,7 +68,7 @@ export const STATIC_CANDIDATES: CandidateDetails[] = [
     name: "Funmilayo Adeyemi",
     party: "New Nigeria Peoples Party (NNPP)", 
     partyAcronym: "NNPP",
-    partyPicture: "/party-logos/nnpp.jpg",
+    partyPicture: `${baseUrl}/party-logos/nnpp.jpg`,
     age: 51,
     qualification: "MSc Economics, Former Minister",
     runningMate: "Alhaji Suleiman Bello",
@@ -102,7 +104,7 @@ export const getPartyPicture = (partyInfo: string | { name?: string; id?: string
   
   if (!partyInfo) {
     console.log('🎨 No party info provided, using placeholder');
-    return '/placeholder-user.jpg';
+    return 'https://via.placeholder.com/100x100/cccccc/666666?text=Party';
   }
   
   // Handle both string and object inputs
@@ -115,23 +117,29 @@ export const getPartyPicture = (partyInfo: string | { name?: string; id?: string
   
   console.log('🎨 Normalized party name:', partyName);
   
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001';
+  
   // Match by party name/acronym to get the correct party picture
   if (partyName.includes('apc') || partyName.includes('all progressives congress')) {
-    console.log('🎨 Matched APC, returning:', '/party-logos/apc.webp');
-    return '/party-logos/apc.webp';
+    const url = `${baseUrl}/party-logos/apc.webp`;
+    console.log('🎨 Matched APC, returning:', url);
+    return url;
   } else if (partyName.includes('pdp') || partyName.includes('peoples democratic party')) {
-    console.log('🎨 Matched PDP, returning:', '/party-logos/pdp.webp');
-    return '/party-logos/pdp.webp';
+    const url = `${baseUrl}/party-logos/pdp.webp`;
+    console.log('🎨 Matched PDP, returning:', url);
+    return url;
   } else if (partyName.includes('lp') || partyName.includes('labour party')) {
-    console.log('🎨 Matched LP, returning:', '/party-logos/labour-party.jpg');
-    return '/party-logos/labour-party.jpg';
+    const url = `${baseUrl}/party-logos/labour-party.jpg`;
+    console.log('🎨 Matched LP, returning:', url);
+    return url;
   } else if (partyName.includes('nnpp') || partyName.includes('new nigeria peoples party')) {
-    console.log('🎨 Matched NNPP, returning:', '/party-logos/nnpp.jpg');
-    return '/party-logos/nnpp.jpg';
+    const url = `${baseUrl}/party-logos/nnpp.jpg`;
+    console.log('🎨 Matched NNPP, returning:', url);
+    return url;
   }
   
-  console.log('🎨 No party match found, using placeholder:', '/placeholder-user.jpg');
-  return '/placeholder-user.jpg';
+  console.log('🎨 No party match found, using placeholder');
+  return 'https://via.placeholder.com/100x100/cccccc/666666?text=Party';
 }
 
 // Helper function to get party picture with candidate name fallback
@@ -162,29 +170,35 @@ export const getPartyPictureWithFallback = (candidateName: string, partyName: st
 const getPartyPictureByCandidateName = (candidateName: string): string => {
   if (!candidateName) {
     console.log('🎨 No candidate name provided for fallback');
-    return '/placeholder-user.jpg';
+    return 'https://via.placeholder.com/100x100/cccccc/666666?text=Party';
   }
   
   const name = candidateName.toLowerCase();
   console.log('🎨 Normalized candidate name for fallback:', name);
   
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001';
+  
   // Match by candidate name to get their specific party picture
   if (name.includes('adebayo') || name.includes('ogundimu')) {
-    console.log('🎨 Fallback matched Adebayo Ogundimu (APC), returning:', '/party-logos/apc.webp');
-    return '/party-logos/apc.webp';
+    const url = `${baseUrl}/party-logos/apc.webp`;
+    console.log('🎨 Fallback matched Adebayo Ogundimu (APC), returning:', url);
+    return url;
   } else if (name.includes('chinedu') || name.includes('okwu')) {
-    console.log('🎨 Fallback matched Chinedu Okwu (PDP), returning:', '/party-logos/pdp.webp');
-    return '/party-logos/pdp.webp';
+    const url = `${baseUrl}/party-logos/pdp.webp`;
+    console.log('🎨 Fallback matched Chinedu Okwu (PDP), returning:', url);
+    return url;
   } else if (name.includes('ibrahim') || name.includes('musa')) {
-    console.log('🎨 Fallback matched Ibrahim Musa (LP), returning:', '/party-logos/labour-party.jpg');
-    return '/party-logos/labour-party.jpg';
+    const url = `${baseUrl}/party-logos/labour-party.jpg`;
+    console.log('🎨 Fallback matched Ibrahim Musa (LP), returning:', url);
+    return url;
   } else if (name.includes('funmilayo') || name.includes('adeyemi')) {
-    console.log('🎨 Fallback matched Funmilayo Adeyemi (NNPP), returning:', '/party-logos/nnpp.jpg');
-    return '/party-logos/nnpp.jpg';
+    const url = `${baseUrl}/party-logos/nnpp.jpg`;
+    console.log('🎨 Fallback matched Funmilayo Adeyemi (NNPP), returning:', url);
+    return url;
   }
   
-  console.log('🎨 No candidate fallback match found, using placeholder:', '/placeholder-user.jpg');
-  return '/placeholder-user.jpg';
+  console.log('🎨 No candidate fallback match found, using placeholder');
+  return 'https://via.placeholder.com/100x100/cccccc/666666?text=Party';
 }
 
 // Helper function to get party name with candidate name fallback
