@@ -4,7 +4,7 @@
  */
 
 const POSSIBLE_IPS = [
-  '10.226.155.194',   // Current working network IP
+  '172.20.10.2',   // Current working network IP
   '192.168.52.2',  // Alternative network IP
   '192.168.56.1',  // Alternative network IP
   '192.168.1.100', // Common WiFi network
@@ -90,7 +90,7 @@ export class NetworkDetector {
     
     // Fallback to working network IP
     console.warn('⚠️ Using fallback API URL');
-    return 'http://10.226.155.194:3001/api';
+    return 'http://172.20.10.2:3001/api';
   }
   
   /**

@@ -100,12 +100,14 @@ class DashboardService {
       console.log('📊 DashboardService: Using API URL:', apiBaseUrl);
       
       const headers = await this.getAuthHeaders();
+      console.log('📊 DashboardService: Making request to:', `${apiBaseUrl}/dashboard/voter`);
       const response = await fetch(`${apiBaseUrl}/dashboard/voter`, {
         method: 'GET',
         headers,
       });
 
       console.log('📊 DashboardService: Response status:', response.status);
+      console.log('📊 DashboardService: Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         if (response.status === 401) {
