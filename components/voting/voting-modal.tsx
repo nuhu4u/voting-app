@@ -367,21 +367,23 @@ export const VotingModal: React.FC<VotingModalProps> = ({
               })}
               </View>
               
-              <View style={styles.buttonRow}>
+              <View style={styles.selectionButtonRow}>
                 <TouchableOpacity 
-                  style={styles.secondaryButton}
+                  style={styles.backButton}
                   onPress={() => setCurrentStep(1)}
                 >
                   <Ionicons name="arrow-back" size={20} color="#6B7280" />
-                  <Text style={styles.secondaryButtonText}>Back</Text>
+                  <Text style={styles.backButtonText}>Back to Verification</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={[styles.primaryButton, !selectedCandidate && styles.disabledButton]}
+                  style={[styles.proceedButton, !selectedCandidate && styles.disabledButton]}
                   onPress={() => setCurrentStep(3)}
                   disabled={!selectedCandidate}
                 >
-                  <Text style={styles.primaryButtonText}>Proceed to Confirmation</Text>
+                  <Text style={styles.proceedButtonText}>
+                    {selectedCandidate ? 'Proceed to Confirmation' : 'Select a Candidate First'}
+                  </Text>
                   <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
@@ -438,17 +440,17 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                 </View>
               )}
               
-              <View style={styles.buttonRow}>
+              <View style={styles.confirmationButtonRow}>
                 <TouchableOpacity 
-                  style={styles.secondaryButton}
+                  style={styles.backButton}
                   onPress={() => setCurrentStep(2)}
                 >
                   <Ionicons name="arrow-back" size={20} color="#6B7280" />
-                  <Text style={styles.secondaryButtonText}>Back</Text>
+                  <Text style={styles.backButtonText}>Back to Selection</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.submitButton}
+                  style={[styles.confirmVoteButton, isSubmitting && styles.disabledButton]}
                   onPress={handleVoteSubmission}
                   disabled={isSubmitting}
                 >
@@ -457,8 +459,8 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                   ) : (
                     <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                   )}
-                  <Text style={styles.submitButtonText}>
-                    {isSubmitting ? 'Submitting...' : 'Cast My Vote'}
+                  <Text style={styles.confirmVoteButtonText}>
+                    {isSubmitting ? 'Submitting Vote...' : 'Confirm & Cast Vote'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -484,20 +486,20 @@ const styles = StyleSheet.create({
   },
   modal: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    width: width * 0.95,
-    height: height * 0.9,
+    borderRadius: 24,
+    width: width * 0.98,
+    height: height * 0.92,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 20,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
+    elevation: 24,
   },
   header: {
     backgroundColor: '#3B82F6',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -508,77 +510,95 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   electionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerText: {
     flex: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 6,
+    lineHeight: 28,
   },
   subtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500',
   },
   closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   progressContainer: {
-    padding: 20,
+    padding: 24,
     backgroundColor: '#F8FAFC',
   },
   progressBar: {
-    height: 6,
+    height: 8,
     backgroundColor: '#E5E7EB',
-    borderRadius: 3,
-    marginBottom: 8,
+    borderRadius: 4,
+    marginBottom: 12,
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#3B82F6',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   progressText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#6B7280',
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 24,
   },
   stepHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
   },
   stepIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: '#EFF6FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   stepTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1F2937',
+    lineHeight: 26,
   },
   stepContent: {
     flex: 1,
@@ -629,23 +649,23 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#3B82F6',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 28,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    marginHorizontal: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    marginHorizontal: 10,
   },
   secondaryButton: {
     backgroundColor: '#F3F4F6',
@@ -672,6 +692,16 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     marginTop: 24,
+  },
+  selectionButtonRow: {
+    flexDirection: 'row',
+    marginTop: 24,
+    gap: 12,
+  },
+  confirmationButtonRow: {
+    flexDirection: 'column',
+    marginTop: 24,
+    gap: 12,
   },
   ballotHeader: {
     backgroundColor: '#F0FDF4',
@@ -709,60 +739,80 @@ const styles = StyleSheet.create({
   },
   candidateCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
     borderWidth: 2,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   selectedCandidateCard: {
     borderColor: '#3B82F6',
     backgroundColor: '#EFF6FF',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 12,
   },
   partyLogoTop: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   partyLogoLarge: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: '#F3F4F6',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: '#000000',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   candidateHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   candidateNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
   candidateNumberText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   candidateCheckbox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 2,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 3,
     borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   candidateInfo: {
     flexDirection: 'row',
@@ -796,28 +846,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   candidateName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1F2937',
-    marginBottom: 4,
+    marginBottom: 6,
     textAlign: 'center',
+    lineHeight: 24,
   },
   candidateParty: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#2563EB',
-    marginBottom: 4,
+    marginBottom: 6,
     textAlign: 'center',
+    fontWeight: '600',
   },
   candidateQualification: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#6B7280',
-    marginBottom: 4,
+    marginBottom: 6,
     textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 18,
   },
   runningMate: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#6B7280',
     textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 18,
   },
   warningCard: {
     backgroundColor: '#FEF3C7',
@@ -910,6 +966,74 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  backButton: {
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  backButtonText: {
+    color: '#6B7280',
+    fontSize: 17,
+    fontWeight: '700',
+    marginLeft: 10,
+  },
+  proceedButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 2,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  proceedButtonText: {
+    color: '#FFFFFF',
+    fontSize: 17,
+    fontWeight: '700',
+    marginRight: 10,
+    textAlign: 'center',
+  },
+  confirmVoteButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 20,
+    paddingHorizontal: 28,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#059669',
+  },
+  confirmVoteButtonText: {
+    color: '#FFFFFF',
+    fontSize: 19,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    textAlign: 'center',
   },
 });
 

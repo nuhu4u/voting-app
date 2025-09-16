@@ -2,8 +2,8 @@ import { AppConfig } from '@/types/common';
 
 // App configuration
 export const config: AppConfig = {
-  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001/api',
-  blockchainNetwork: process.env.EXPO_PUBLIC_BLOCKCHAIN_NETWORK || '172.20.10.2',
+  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.18.14:3001/api',
+  blockchainNetwork: process.env.EXPO_PUBLIC_BLOCKCHAIN_NETWORK || '192.168.18.14',
   appVersion: '1.0.0',
   environment: (process.env.EXPO_PUBLIC_ENVIRONMENT as 'development' | 'staging' | 'production') || 'development',
   features: {
@@ -18,8 +18,8 @@ export const config: AppConfig = {
 export const API_BASE_URL = config.apiUrl;
 export const apiConfig = {
   baseUrl: config.apiUrl,
-  timeout: 30000,
-  retryAttempts: 3,
+  timeout: 10000, // Reduced from 30000 to 10000 (10 seconds)
+  retryAttempts: 2, // Reduced from 3 to 2
   retryDelay: 1000,
   headers: {
     'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export const apiConfig = {
 // Blockchain configuration
 export const blockchainConfig = {
   network: config.blockchainNetwork,
-  rpcUrl: process.env.EXPO_PUBLIC_RPC_URL || 'http://172.20.10.2:8545',
+  rpcUrl: process.env.EXPO_PUBLIC_RPC_URL || 'http://192.168.18.14:8545',
   chainId: parseInt(process.env.EXPO_PUBLIC_CHAIN_ID || '1337'),
   gasLimit: 300000,
   gasPrice: '20000000000', // 20 gwei

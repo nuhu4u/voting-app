@@ -559,8 +559,16 @@ export default function DashboardScreen() {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-            <Ionicons name="refresh" size={20} color="#64748b" />
+          <TouchableOpacity 
+            style={[styles.refreshButton, refreshing && styles.refreshingButton]} 
+            onPress={handleRefresh}
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <ActivityIndicator size="small" color="#3b82f6" />
+            ) : (
+              <Ionicons name="refresh" size={22} color="#3b82f6" />
+            )}
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.configButton} 
@@ -614,21 +622,13 @@ export default function DashboardScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
-        {/* Profile Picture Section */}
-        <View style={styles.profileCard}>
-          <View style={styles.profilePicture}>
-            <Ionicons name="person" size={32} color="#64748b" />
-          </View>
-          <Text style={styles.profileName}>
-            {user?.first_name} {user?.last_name}
-          </Text>
-        </View>
 
         {/* Voter Information Card */}
         <View style={styles.voterCard}>
           <View style={styles.cardHeader}>
-            <Ionicons name="person" size={20} color="#64748b" />
+            <Ionicons name="card" size={20} color="#3b82f6" />
             <Text style={styles.cardTitle}>Voter Information</Text>
           </View>
           
@@ -782,30 +782,45 @@ export default function DashboardScreen() {
           </View>
         </View>
 
-        {/* Tab Navigation */}
+        {/* Mobile-Optimized Tab Navigation */}
         <View style={styles.tabContainer}>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'elections' && styles.activeTab]}
             onPress={() => setActiveTab('elections')}
           >
+            <Ionicons 
+              name="ballot-outline" 
+              size={18} 
+              color={activeTab === 'elections' ? '#3b82f6' : '#64748b'} 
+            />
             <Text style={[styles.tabText, activeTab === 'elections' && styles.activeTabText]}>
-              Active Elections
+              Elections
             </Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'results' && styles.activeTab]}
             onPress={() => setActiveTab('results')}
           >
+            <Ionicons 
+              name="bar-chart-outline" 
+              size={18} 
+              color={activeTab === 'results' ? '#3b82f6' : '#64748b'} 
+            />
             <Text style={[styles.tabText, activeTab === 'results' && styles.activeTabText]}>
-              Live Results
+              Results
             </Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'history' && styles.activeTab]}
             onPress={() => setActiveTab('history')}
           >
+            <Ionicons 
+              name="time-outline" 
+              size={18} 
+              color={activeTab === 'history' ? '#3b82f6' : '#64748b'} 
+            />
             <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
-              Vote History
+              History
             </Text>
           </TouchableOpacity>
         </View>
@@ -813,41 +828,52 @@ export default function DashboardScreen() {
         {/* Tab Content */}
         {activeTab === 'elections' && (
           <View style={styles.tabContent}>
-            <Text style={styles.sectionTitle}>Available Elections</Text>
-            {elections.map((election) => (
-              <View key={election.id} style={styles.electionCard}>
-                <View style={styles.electionHeader}>
-                  <View style={styles.electionInfo}>
-                    <Text style={styles.electionTitle}>{election.title}</Text>
-                    <Text style={styles.electionSubtitle}>
-                      {election.type} • Ends {new Date(election.endTime).toLocaleDateString()}
-                    </Text>
-                  </View>
-                  <View style={[styles.badge, styles.pendingBadge]}>
-                    <Text style={[styles.badgeText, styles.pendingText]}>Pending</Text>
-                  </View>
-                </View>
-                
-                <Text style={styles.electionDescription}>
-                  Cast your vote for the {election.type.toLowerCase()} election. You can vote for one candidate per election.
-                </Text>
-                
-                <TouchableOpacity 
-                  style={styles.voteButton}
-                  onPress={() => {
-                    console.log('🗳️ Dashboard: Cast vote button pressed for election:', election);
-                    console.log('🗳️ Dashboard: Election contestants:', election.contestants);
-                    console.log('🗳️ Dashboard: Setting showVotingModal to true');
-                    setSelectedElection(election);
-                    setShowVotingModal(true);
-                    console.log('🗳️ Dashboard: showVotingModal should now be true');
-                  }}
-                >
-                  <Ionicons name="checkmark-circle" size={16} color="white" />
-                  <Text style={styles.voteButtonText}>Cast Your Vote</Text>
-                </TouchableOpacity>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Available Elections</Text>
+              <Text style={styles.sectionSubtitle}>{elections.length} election{elections.length !== 1 ? 's' : ''} available</Text>
+            </View>
+            {elections.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="ballot-outline" size={48} color="#9ca3af" />
+                <Text style={styles.emptyTitle}>No Active Elections</Text>
+                <Text style={styles.emptyText}>There are currently no elections available for voting.</Text>
               </View>
-            ))}
+            ) : (
+              elections.map((election) => (
+                <View key={election.id} style={styles.electionCard}>
+                  <View style={styles.electionHeader}>
+                    <View style={styles.electionInfo}>
+                      <Text style={styles.electionTitle}>{election.title}</Text>
+                      <Text style={styles.electionSubtitle}>
+                        {election.type} • Ends {new Date(election.endTime).toLocaleDateString()}
+                      </Text>
+                    </View>
+                    <View style={[styles.badge, styles.pendingBadge]}>
+                      <Text style={[styles.badgeText, styles.pendingText]}>Active</Text>
+                    </View>
+                  </View>
+                  
+                  <Text style={styles.electionDescription}>
+                    Cast your vote for the {election.type.toLowerCase()} election. You can vote for one candidate per election.
+                  </Text>
+                  
+                  <TouchableOpacity 
+                    style={styles.voteButton}
+                    onPress={() => {
+                      console.log('🗳️ Dashboard: Cast vote button pressed for election:', election);
+                      console.log('🗳️ Dashboard: Election contestants:', election.contestants);
+                      console.log('🗳️ Dashboard: Setting showVotingModal to true');
+                      setSelectedElection(election);
+                      setShowVotingModal(true);
+                      console.log('🗳️ Dashboard: showVotingModal should now be true');
+                    }}
+                  >
+                    <Ionicons name="checkmark-circle" size={18} color="white" />
+                    <Text style={styles.voteButtonText}>Cast Your Vote</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            )}
           </View>
         )}
 
@@ -988,45 +1014,63 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: 18,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   profileIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#dbeafe',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1e293b',
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748b',
+    fontWeight: '500',
   },
   headerRight: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   refreshButton: {
-    padding: 8,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  refreshingButton: {
+    backgroundColor: '#e0f2fe',
+    borderColor: '#0ea5e9',
   },
   configButton: {
     padding: 8,
@@ -1073,52 +1117,21 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 8,
-  },
-  profileCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  profilePicture: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#dbeafe',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#3b82f6',
-    marginBottom: 16,
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1e293b',
   },
   voterCard: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -1127,14 +1140,16 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   cardTitle: {
     fontSize: 16,
@@ -1204,14 +1219,16 @@ const styles = StyleSheet.create({
   },
   statusCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   statusLabel: {
     fontSize: 14,
@@ -1230,14 +1247,16 @@ const styles = StyleSheet.create({
   },
   votePositionCard: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   votePositionDescription: {
     fontSize: 14,
@@ -1331,29 +1350,40 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 4,
-    marginBottom: 16,
+    borderRadius: 16,
+    padding: 8,
+    marginBottom: 24,
+    marginHorizontal: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   tab: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 14,
     paddingHorizontal: 12,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   activeTab: {
     backgroundColor: '#3b82f6',
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
   tabText: {
     fontSize: 14,
     color: '#64748b',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   activeTabText: {
     color: 'white',
@@ -1362,22 +1392,60 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
+  sectionHeader: {
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginBottom: 16,
+    marginBottom: 6,
   },
-  electionCard: {
+  sectionSubtitle: {
+    fontSize: 15,
+    color: '#64748b',
+    fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    marginVertical: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  electionCard: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 22,
+    marginBottom: 20,
+    marginHorizontal: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   electionHeader: {
     flexDirection: 'row',
@@ -1389,34 +1457,44 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   electionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginBottom: 4,
+    marginBottom: 6,
+    lineHeight: 26,
   },
   electionSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748b',
+    fontWeight: '500',
   },
   electionDescription: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748b',
-    marginBottom: 16,
-    lineHeight: 20,
+    marginBottom: 20,
+    lineHeight: 22,
+    fontWeight: '400',
   },
   voteButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3b82f6',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: '#10B981',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 28,
+    marginTop: 20,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
   voteButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    marginLeft: 10,
   },
   leadingText: {
     fontSize: 14,

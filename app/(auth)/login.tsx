@@ -30,16 +30,11 @@ export default function LoginScreen() {
     clearError();
   }, [clearError]);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (only when authentication status changes)
   useEffect(() => {
-    console.log('🔐 Login page: Checking authentication status');
-    console.log('🔐 isAuthenticated:', isAuthenticated);
-    
     if (isAuthenticated) {
       console.log('✅ User is already authenticated, redirecting to dashboard');
       router.replace('/dashboard/page');
-    } else {
-      console.log('❌ User is not authenticated, staying on login page');
     }
   }, [isAuthenticated]);
 

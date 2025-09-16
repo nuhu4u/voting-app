@@ -154,66 +154,39 @@ export default function HomePage() {
         </View>
       </View>
 
-      {/* Quick Actions */}
-      <View style={styles.actionsSection}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.actionsGrid}>
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/(auth)/register')}
-          >
-            <View style={styles.actionContent}>
-              <Ionicons name="person-add" size={32} color="#2563eb" />
-              <Text style={styles.actionTitle}>Register as Voter</Text>
-              <Text style={styles.actionDescription}>Complete your voter registration with NIN verification</Text>
-              <View style={styles.actionButton}>
-                <Text style={styles.actionButtonText}>Register Now</Text>
+      {/* Elections Access */}
+      <View style={styles.electionsAccessSection}>
+        <TouchableOpacity
+          style={styles.electionsCard}
+          onPress={() => router.push('/(tabs)/elections')}
+        >
+          <View style={styles.electionsCardContent}>
+            <View style={styles.electionsCardHeader}>
+              <View style={styles.electionsIconContainer}>
+                <Ionicons name="checkmark-circle" size={32} color="#ffffff" />
+              </View>
+              <View style={styles.electionsCardText}>
+                <Text style={styles.electionsCardTitle}>Live Elections</Text>
+                <Text style={styles.electionsCardSubtitle}>Participate in ongoing elections</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#16a34a" />
+            </View>
+            <View style={styles.electionsCardStats}>
+              <View style={styles.statItem}>
+                <Ionicons name="people" size={16} color="#64748b" />
+                <Text style={styles.statText}>Active Elections</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Ionicons name="time" size={16} color="#64748b" />
+                <Text style={styles.statText}>Real-time Results</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Ionicons name="shield-checkmark" size={16} color="#64748b" />
+                <Text style={styles.statText}>Secure Voting</Text>
               </View>
             </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/(auth)/login')}
-          >
-            <View style={styles.actionContent}>
-              <Ionicons name="log-in" size={32} color="#64748b" />
-              <Text style={styles.actionTitle}>Voter Login</Text>
-              <Text style={styles.actionDescription}>Access your dashboard to cast votes and view results</Text>
-              <View style={[styles.actionButton, styles.actionButtonSecondary]}>
-                <Text style={styles.actionButtonSecondaryText}>Login</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/(tabs)/elections')}
-          >
-            <View style={styles.actionContent}>
-              <Ionicons name="checkmark-circle" size={32} color="#16a34a" />
-              <Text style={styles.actionTitle}>Live Elections</Text>
-              <Text style={styles.actionDescription}>View ongoing elections and real-time results</Text>
-              <View style={[styles.actionButton, styles.actionButtonSecondary]}>
-                <Text style={styles.actionButtonSecondaryText}>View Elections</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/observer/login')}
-          >
-            <View style={styles.actionContent}>
-              <Ionicons name="eye" size={32} color="#9333ea" />
-              <Text style={styles.actionTitle}>Observer Portal</Text>
-              <Text style={styles.actionDescription}>Accredited observers can monitor elections in real-time</Text>
-              <View style={[styles.actionButton, styles.actionButtonSecondary]}>
-                <Text style={styles.actionButtonSecondaryText}>Observer Login</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </View>
 
       {/* Current Elections Status */}
@@ -536,29 +509,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   statsSection: {
-    paddingVertical: 24,
+    paddingVertical: 20,
     paddingHorizontal: 16,
     backgroundColor: '#f1f5f9',
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginBottom: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: 8,
   },
   statCard: {
     width: '48%',
     backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
     borderLeftWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   statCardBlue: {
     borderLeftColor: '#2563eb',
@@ -592,63 +571,74 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#64748b',
   },
-  actionsSection: {
-    paddingVertical: 24,
-    backgroundColor: '#f1f5f9',
+  electionsAccessSection: {
+    paddingVertical: 20,
     paddingHorizontal: 16,
+    backgroundColor: '#f8fafc',
   },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  actionCard: {
-    width: '48%',
+  electionsCard: {
     backgroundColor: 'white',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    overflow: 'hidden',
   },
-  actionContent: {
+  electionsCardContent: {
+    padding: 20,
+  },
+  electionsCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  electionsIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#16a34a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+    shadowColor: '#16a34a',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  electionsCardText: {
+    flex: 1,
+  },
+  electionsCardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  electionsCardSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  electionsCardStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+  },
+  statItem: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  actionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginTop: 8,
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  actionDescription: {
-    color: '#64748b',
-    textAlign: 'center',
+  statText: {
     fontSize: 12,
-    marginBottom: 10,
-    lineHeight: 16,
-  },
-  actionButton: {
-    width: '100%',
-    backgroundColor: '#2563eb',
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  actionButtonSecondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-  },
-  actionButtonText: {
-    color: 'white',
-    fontWeight: '600',
-    textAlign: 'center',
-    fontSize: 14,
-  },
-  actionButtonSecondaryText: {
-    color: '#374151',
-    fontWeight: '600',
-    textAlign: 'center',
-    fontSize: 14,
+    color: '#64748b',
+    marginLeft: 6,
+    fontWeight: '500',
   },
   electionsStatusSection: {
     paddingVertical: 24,
