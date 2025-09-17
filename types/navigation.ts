@@ -6,7 +6,6 @@ export type RootStackParamList = {
   index: undefined;
   '(tabs)': NavigatorScreenParams<TabParamList>;
   '(auth)': NavigatorScreenParams<AuthStackParamList>;
-  admin: NavigatorScreenParams<AdminStackParamList>;
   observer: NavigatorScreenParams<ObserverStackParamList>;
   blockchain: NavigatorScreenParams<BlockchainStackParamList>;
   'vote-position': NavigatorScreenParams<VotePositionStackParamList>;
@@ -32,12 +31,6 @@ export type AuthStackParamList = {
   'verify-nin': undefined;
 };
 
-// Admin Stack Navigator
-export type AdminStackParamList = {
-  index: undefined;
-  login: undefined;
-  register: undefined;
-};
 
 // Observer Stack Navigator
 export type ObserverStackParamList = {

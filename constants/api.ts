@@ -37,13 +37,6 @@ export const API_ENDPOINTS = {
     reports: '/observer/reports',
     elections: '/observer/elections',
   },
-  admin: {
-    dashboard: '/admin/dashboard',
-    users: '/admin/users',
-    elections: '/admin/elections',
-    reports: '/admin/reports',
-    stats: '/admin/stats',
-  },
 } as const;
 
 export const HTTP_STATUS = {

@@ -22,12 +22,7 @@ export interface ObserverUser extends User {
   last_login?: string;
 }
 
-export interface AdminUser extends User {
-  permissions: string[];
-  last_login?: string;
-}
-
-export type UserRole = 'voter' | 'observer' | 'admin';
+export type UserRole = 'voter' | 'observer';
 
 export interface LoginCredentials {
   emailOrNin: string;
