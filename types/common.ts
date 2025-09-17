@@ -76,7 +76,6 @@ export interface AppConfig {
   environment: 'development' | 'staging' | 'production';
   features: {
     blockchain: boolean;
-    observer: boolean;
     offline: boolean;
     biometrics: boolean;
   };

@@ -14,15 +14,7 @@ export interface User {
   last_login?: string;
 }
 
-export interface ObserverUser extends User {
-  organization: string;
-  accreditation_number: string;
-  assigned_elections: string[];
-  is_verified: boolean;
-  last_login?: string;
-}
-
-export type UserRole = 'voter' | 'observer';
+export type UserRole = 'voter';
 
 export interface LoginCredentials {
   emailOrNin: string;

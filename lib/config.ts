@@ -8,7 +8,6 @@ export const config: AppConfig = {
   environment: (process.env.EXPO_PUBLIC_ENVIRONMENT as 'development' | 'staging' | 'production') || 'development',
   features: {
     blockchain: process.env.EXPO_PUBLIC_ENABLE_BLOCKCHAIN === 'true',
-    observer: process.env.EXPO_PUBLIC_ENABLE_OBSERVER_FEATURES === 'true',
     offline: process.env.EXPO_PUBLIC_ENABLE_OFFLINE === 'true',
     biometrics: process.env.EXPO_PUBLIC_ENABLE_BIOMETRICS === 'true',
   },

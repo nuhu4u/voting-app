@@ -350,9 +350,6 @@ export default function HomePage() {
                         <TouchableOpacity onPress={() => router.push('/(tabs)/elections')}>
                           <Text style={styles.footerLink}>Live Elections</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => router.push('/observer/login')}>
-                          <Text style={styles.footerLink}>Observer Portal</Text>
-                        </TouchableOpacity>
                       </View>
 
                       <View style={styles.footerSecurity}>

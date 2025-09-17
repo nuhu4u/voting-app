@@ -32,11 +32,6 @@ export const API_ENDPOINTS = {
     verify: '/blockchain/verify',
     status: '/blockchain/status',
   },
-  observer: {
-    dashboard: '/observer/dashboard',
-    reports: '/observer/reports',
-    elections: '/observer/elections',
-  },
 } as const;
 
 export const HTTP_STATUS = {

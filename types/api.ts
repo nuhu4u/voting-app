@@ -53,16 +53,4 @@ export interface ApiEndpoints {
     verify: string;
     status: string;
   };
-  observer: {
-    dashboard: string;
-    reports: string;
-    elections: string;
-  };
-  admin: {
-    dashboard: string;
-    users: string;
-    elections: string;
-    reports: string;
-    stats: string;
-  };
 }
