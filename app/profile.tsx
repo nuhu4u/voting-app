@@ -14,12 +14,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/store/auth-store';
 import { router } from 'expo-router';
 import ProfileEditModal from '@/components/profile/profile-edit-modal';
+import BiometricStatusComponent from '@/components/biometric/BiometricStatus';
+import BiometricRegistrationModal from '@/components/biometric/BiometricRegistrationModal';
+import { BiometricStatus } from '@/lib/api/biometric-service';
 
 export default function ProfileScreen() {
   const { user, logout, isLoading, updateUser } = useAuthStore();
   const [refreshing, setRefreshing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showBiometricModal, setShowBiometricModal] = useState(false);
+  const [biometricStatus, setBiometricStatus] = useState<BiometricStatus | null>(null);
 
   const handleLogout = () => {
     Alert.alert(
@@ -93,9 +98,9 @@ export default function ProfileScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <View style={styles.profileIcon}>
-            <Ionicons name="person" size={32} color="#3B82F6" />
-          </View>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
           <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Profile</Text>
             <Text style={styles.headerSubtitle}>Manage your account</Text>
@@ -237,6 +242,12 @@ export default function ProfileScreen() {
         </View>
       </View>
 
+      {/* Biometric Security Status */}
+      <BiometricStatusComponent
+        onStatusChange={(status) => setBiometricStatus(status)}
+        onRegisterPress={() => setShowBiometricModal(true)}
+      />
+
       {/* Quick Actions */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Quick Actions</Text>
@@ -291,6 +302,19 @@ export default function ProfileScreen() {
           onProfileUpdated={handleProfileUpdated}
         />
       )}
+
+      {/* Biometric Registration Modal */}
+      {user && (
+        <BiometricRegistrationModal
+          visible={showBiometricModal}
+          onClose={() => setShowBiometricModal(false)}
+          onSuccess={() => {
+            // Refresh biometric status after successful registration
+            console.log('Biometric registration successful');
+          }}
+          userName={`${user.first_name} ${user.last_name}`}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -336,21 +360,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#3B82F6',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    paddingTop: 50,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  profileIcon: {
+  backButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EBF4FF',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -361,11 +384,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#FFFFFF',
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 2,
   },
   logoutButton: {

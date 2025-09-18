@@ -16,7 +16,7 @@ const useNetwork = () => ({
     isConnectionExpensive: false,
     ssid: 'MockWiFi',
     strength: 100,
-    ipAddress: '192.168.1.100',
+    ipAddress: 'localhost',
     subnet: '255.255.255.0',
     frequency: 2400,
   },

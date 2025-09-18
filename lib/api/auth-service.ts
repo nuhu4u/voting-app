@@ -44,6 +44,9 @@ class AuthService {
     retryCount = 0
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
+    console.log('🔐 AuthService: Making request to:', url);
+    console.log('🔐 AuthService: Base URL:', this.baseUrl);
+    console.log('🔐 AuthService: Endpoint:', endpoint);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 

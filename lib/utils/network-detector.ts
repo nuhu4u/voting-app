@@ -4,9 +4,11 @@
  */
 
 const POSSIBLE_IPS = [
-  '172.20.10.2',   // Current working network IP
-  '192.168.52.2',  // Alternative network IP
-  '192.168.56.1',  // Alternative network IP
+  '172.20.10.2',  // WiFi IP (primary)
+  '192.168.56.1', // VirtualBox IP
+  '192.168.52.2', // Alternative network IP
+  'localhost',     // Local development
+  '127.0.0.1',    // Local development alternative
   '192.168.1.100', // Common WiFi network
   '192.168.0.100', // Alternative WiFi network
   '10.0.2.2',      // Android emulator host
@@ -88,7 +90,7 @@ export class NetworkDetector {
       return `http://${backendIP}:${BACKEND_PORT}/api`;
     }
     
-    // Fallback to working network IP
+    // Fallback to WiFi IP
     console.warn('⚠️ Using fallback API URL');
     return 'http://172.20.10.2:3001/api';
   }

@@ -167,7 +167,7 @@ export const VoteHistoryCard: React.FC<VoteHistoryCardProps> = ({
         
         {vote.transaction_hash && (
           <TouchableOpacity style={styles.actionButton} onPress={() => onExploreBlockchain(vote.transaction_hash!)}>
-            <Ionicons name="hash-outline" size={16} color="#374151" />
+            <Ionicons name="document-text-outline" size={16} color="#374151" />
             <Text style={styles.actionButtonText}>Explore Blockchain</Text>
           </TouchableOpacity>
         )}

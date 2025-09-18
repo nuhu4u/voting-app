@@ -2,7 +2,7 @@ import { AppConfig } from '@/types/common';
 
 // App configuration
 export const config: AppConfig = {
-  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://10.226.155.194:3001/api',
+  apiUrl: process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001/api', // Use WiFi IP
   blockchainNetwork: process.env.EXPO_PUBLIC_BLOCKCHAIN_NETWORK || '10.226.155.194',
   appVersion: '1.0.0',
   environment: (process.env.EXPO_PUBLIC_ENVIRONMENT as 'development' | 'staging' | 'production') || 'development',
@@ -15,11 +15,12 @@ export const config: AppConfig = {
 
 // API configuration
 export const API_BASE_URL = config.apiUrl;
+console.log('🔧 Config: API URL set to:', config.apiUrl);
 export const apiConfig = {
   baseUrl: config.apiUrl,
-  timeout: 10000, // Reduced from 30000 to 10000 (10 seconds)
-  retryAttempts: 2, // Reduced from 3 to 2
-  retryDelay: 1000,
+  timeout: 30000, // Increased back to 30 seconds for biometric operations
+  retryAttempts: 3, // Increased back to 3 attempts
+  retryDelay: 2000, // Increased delay between retries
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

@@ -12,7 +12,7 @@ import {
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, Link, useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
 import { validationRules } from '@/lib/config';
 
@@ -24,6 +24,7 @@ export default function LoginScreen() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const { login, isLoading, error, clearError, isAuthenticated } = useAuthStore();
+  const navigation = useRouter();
 
   // Clear errors when component mounts
   useEffect(() => {
@@ -106,6 +107,23 @@ export default function LoginScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
+          {/* Back Button */}
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => {
+              try {
+                router.replace('/(tabs)/elections');
+              } catch (error) {
+                console.log('Navigation error:', error);
+                // Fallback: try to navigate to elections
+                router.push('/(tabs)/elections');
+              }
+            }}
+          >
+            <Ionicons name="arrow-back" size={24} color="#374151" />
+            <Text style={styles.backButtonText}>Back to Home</Text>
+          </TouchableOpacity>
+          
           <View style={styles.logoContainer}>
             <Ionicons name="balloon-outline" size={48} color="#2563eb" />
             <Text style={styles.logoText}>Nigerian E-Voting Portal</Text>
@@ -273,6 +291,24 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  backButtonText: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#374151',
+    fontWeight: '500',
   },
   logoContainer: {
     alignItems: 'center',

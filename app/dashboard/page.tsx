@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/auth-store';
-import { dashboardService, DashboardData, Election as APIElection, Vote } from '@/lib/api/dashboard-service';
+import { dashboardService, Election as APIElection, Vote } from '@/lib/api/dashboard-service';
 import { ApiConfigModal } from '@/components/common/ApiConfigModal';
 import { VoteHistoryList } from '@/components/dashboard/vote-history-list';
 import { useVoteHistory } from '@/hooks/use-vote-history';
@@ -60,7 +60,7 @@ export default function DashboardScreen() {
   const { user, isAuthenticated, logout, isLoading: authLoading } = useAuthStore();
   
   // Vote history hook
-  const { voteHistory, loading: voteHistoryLoading, error: voteHistoryError, refreshVoteHistory } = useVoteHistory();
+  const { refreshVoteHistory } = useVoteHistory();
   
   // Active tab state
   const [activeTab, setActiveTab] = useState<'elections' | 'results' | 'history'>('elections');
@@ -128,98 +128,6 @@ export default function DashboardScreen() {
 
   // Removed health check - using proper authentication instead
 
-  const loadMockData = async () => {
-    console.log('📊 Dashboard: Loading mock data...');
-    
-    // Mock voter info
-    setVoterInfo({
-      name: `${user?.first_name} ${user?.last_name}` || 'John Doe',
-      voterId: 'VID-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      blockchainAddress: '0x' + Math.random().toString(16).substr(2, 40),
-      email: user?.email || 'user@example.com',
-      ninVerified: true,
-      pollingUnit: 'Polling Unit 001',
-      ward: 'Ward 5',
-      lga: 'Ikeja',
-      state: 'Lagos',
-    });
-    
-    // Mock elections
-    const mockElections = [
-      {
-        id: 'presidential-2027',
-        title: 'Presidential Election 2027',
-        type: 'Presidential',
-        status: 'ONGOING',
-        endTime: '2027-02-25 18:00',
-        hasVoted: false,
-        votePosition: 0,
-        voteTimestamp: null,
-        contestants: [
-          { id: 'candidate-1', name: 'Adebayo Ogundimu', party: 'APC', votes: 1250 },
-          { id: 'candidate-2', name: 'Chinedu Okwu', party: 'PDP', votes: 980 },
-          { id: 'candidate-3', name: 'Ibrahim Musa', party: 'LP', votes: 750 },
-        ],
-        leadingCandidate: {
-          name: 'Adebayo Ogundimu',
-          party: 'APC',
-          runningMate: 'Dr. Fatima Abdullahi'
-        },
-        total_votes: 2980,
-      }
-    ];
-    
-    // Mock voted elections for vote history
-    const mockVotedElections = [
-      {
-        id: 'gubernatorial-2026',
-        title: 'Governorship Election 2025',
-        type: 'Gubernatorial',
-        status: 'COMPLETED',
-        endTime: '2026-03-18 18:00',
-        hasVoted: true,
-        votePosition: 1842,
-        voteTimestamp: '2026-03-10T14:30:00Z',
-        contestants: [
-          { id: 'candidate-gov-1', name: 'Adebayo Ogundimu', party: 'All Progressives Congress', votes: 890, running_mate: 'Dr. Fatima Abdullahi' },
-          { id: 'candidate-gov-2', name: 'Emeka Okafor', party: 'PDP', votes: 620, running_mate: 'Prof. Sarah Johnson' },
-        ],
-        leadingCandidate: {
-          name: 'Adebayo Ogundimu',
-          party: 'All Progressives Congress',
-          runningMate: 'Dr. Fatima Abdullahi'
-        },
-        total_votes: 1510,
-      }
-    ];
-    
-    // Mock vote history
-    const mockVoteHistory = [
-      {
-        _id: 'vote-1',
-        election_id: 'gubernatorial-2026',
-        candidate_id: 'candidate-gov-1',
-        vote_position: 1842,
-        vote_timestamp: '2026-03-10T14:30:00Z',
-        transaction_hash: '0x8d7885e4a3551e60',
-        blockchain_block_number: 12345678,
-        blockchain_gas_used: '21000',
-        created_at: '2026-03-10T14:30:00Z',
-      }
-    ];
-    
-    setElections(mockElections);
-    setVotedElections(mockVotedElections);
-    setMyVotes(mockVoteHistory);
-    
-    // Mock stats
-    setStats({
-      totalRegisteredVoters: 84004084,
-      totalVotesCast: 45234567,
-      nonVoters: 38769517,
-      turnoutPercentage: 53.8,
-    });
-  };
 
   const loadDashboardData = async () => {
     try {
@@ -238,9 +146,9 @@ export default function DashboardScreen() {
         console.log('📊 Dashboard: Full data object:', JSON.stringify(data, null, 2));
         
         // Debug elections data
-        if (data.elections) {
-          console.log('📊 Dashboard: Elections count:', data.elections.length);
-          data.elections.forEach((election: any, index: number) => {
+        if (data.activeElections) {
+          console.log('📊 Dashboard: Elections count:', data.activeElections.length);
+          data.activeElections.forEach((election: any, index: number) => {
             console.log(`📊 Dashboard: Election ${index}:`, election.title);
             console.log(`📊 Dashboard: Election ${index} contestants:`, election.contestants);
             console.log(`📊 Dashboard: Election ${index} contestants length:`, election.contestants?.length || 0);
@@ -342,98 +250,6 @@ export default function DashboardScreen() {
     }
   };
 
-  const loadFallbackData = async () => {
-    console.log('📊 Dashboard: Loading fallback data...');
-    
-    // Fallback voter info
-    setVoterInfo({
-      name: `${user?.first_name} ${user?.last_name}` || 'John Doe',
-      voterId: 'VID-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-      blockchainAddress: '0x' + Math.random().toString(16).substr(2, 40),
-      email: user?.email || 'user@example.com',
-      ninVerified: true,
-      pollingUnit: 'Polling Unit 001',
-      ward: 'Ward 5',
-      lga: 'Ikeja',
-      state: 'Lagos',
-    });
-    
-    // Fallback elections
-    const fallbackElections = [
-      {
-        id: 'presidential-2027',
-        title: 'Presidential Election 2027',
-        type: 'Presidential',
-        status: 'ONGOING',
-        endTime: '2027-02-25 18:00',
-        hasVoted: false,
-        votePosition: 0,
-        voteTimestamp: null,
-        contestants: [
-          { id: 'candidate-1', name: 'Adebayo Ogundimu', party: 'APC', votes: 1250 },
-          { id: 'candidate-2', name: 'Chinedu Okwu', party: 'PDP', votes: 980 },
-          { id: 'candidate-3', name: 'Ibrahim Musa', party: 'LP', votes: 750 },
-        ],
-        leadingCandidate: {
-          name: 'Adebayo Ogundimu',
-          party: 'APC',
-          runningMate: 'Dr. Fatima Abdullahi'
-        },
-        total_votes: 2980,
-      }
-    ];
-    
-    // Fallback voted elections for testing vote history
-    const fallbackVotedElections = [
-      {
-        id: 'gubernatorial-2026',
-        title: 'Lagos State Gubernatorial Election 2026',
-        type: 'Gubernatorial',
-        status: 'COMPLETED',
-        endTime: '2026-03-18 18:00',
-        hasVoted: true,
-        votePosition: 1842,
-        voteTimestamp: '2026-03-10T14:30:00Z',
-        contestants: [
-          { id: 'candidate-gov-1', name: 'Funmilayo Adeyemi', party: 'APC', votes: 890, running_mate: 'Dr. Kemi Williams' },
-          { id: 'candidate-gov-2', name: 'Emeka Okafor', party: 'PDP', votes: 620, running_mate: 'Prof. Sarah Johnson' },
-        ],
-        leadingCandidate: {
-          name: 'Funmilayo Adeyemi',
-          party: 'APC',
-          runningMate: 'Dr. Kemi Williams'
-        },
-        total_votes: 1510,
-      }
-    ];
-    
-    // Fallback vote history
-    const fallbackVoteHistory = [
-      {
-        _id: 'vote-1',
-        election_id: 'gubernatorial-2026',
-        candidate_id: 'candidate-gov-1',
-        vote_position: 1842,
-        vote_timestamp: '2026-03-10T14:30:00Z',
-        transaction_hash: '0x' + Math.random().toString(16).substr(2, 40),
-        blockchain_block_number: 12345678,
-        blockchain_gas_used: '21000',
-        created_at: '2026-03-10T14:30:00Z',
-      }
-    ];
-    
-    setElections(fallbackElections);
-    setVotedElections(fallbackVotedElections);
-    setMyVotes(fallbackVoteHistory);
-    
-    // Fallback stats
-    setStats({
-      totalRegisteredVoters: 84004084,
-      totalVotesCast: 45234567,
-      nonVoters: 38769517,
-      turnoutPercentage: 53.8,
-    });
-  };
 
   const handleRefresh = async () => {
     console.log('🔄 Dashboard: Refreshing data');
@@ -708,7 +524,10 @@ export default function DashboardScreen() {
 
           {/* View Full Profile Button */}
           <View style={styles.profileButtonContainer}>
-            <TouchableOpacity style={styles.profileButton}>
+            <TouchableOpacity 
+              style={styles.profileButton}
+              onPress={() => router.push('/profile')}
+            >
               <Ionicons name="person" size={16} color="#64748b" />
               <Text style={styles.profileButtonText}>View Full Profile</Text>
             </TouchableOpacity>
@@ -752,7 +571,10 @@ export default function DashboardScreen() {
             Track your vote position across all electoral levels
           </Text>
           
-          <TouchableOpacity style={styles.votePositionButton}>
+          <TouchableOpacity 
+            style={styles.votePositionButton}
+            onPress={() => router.push('/vote-position')}
+          >
             <Ionicons name="location" size={16} color="white" />
             <Text style={styles.votePositionButtonText}>View Vote Position</Text>
           </TouchableOpacity>
@@ -789,7 +611,7 @@ export default function DashboardScreen() {
             onPress={() => setActiveTab('elections')}
           >
             <Ionicons 
-              name="ballot" 
+              name="document-text" 
               size={18} 
               color={activeTab === 'elections' ? '#3b82f6' : '#64748b'} 
             />
@@ -834,7 +656,7 @@ export default function DashboardScreen() {
             </View>
             {elections.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="ballot" size={48} color="#9ca3af" />
+                <Ionicons name="document-text" size={48} color="#9ca3af" />
                 <Text style={styles.emptyTitle}>No Active Elections</Text>
                 <Text style={styles.emptyText}>There are currently no elections available for voting.</Text>
               </View>
@@ -863,7 +685,7 @@ export default function DashboardScreen() {
                       console.log('🗳️ Dashboard: Cast vote button pressed for election:', election);
                       console.log('🗳️ Dashboard: Election contestants:', election.contestants);
                       console.log('🗳️ Dashboard: Setting showVotingModal to true');
-                      setSelectedElection(election);
+                      setSelectedElection(election as any);
                       setShowVotingModal(true);
                       console.log('🗳️ Dashboard: showVotingModal should now be true');
                     }}
@@ -926,7 +748,7 @@ export default function DashboardScreen() {
         {activeTab === 'history' && (
           <VoteHistoryList
             voteHistory={myVotes} // Use myVotes from dashboard data
-            elections={[...elections, ...votedElections]} // Pass all elections for context
+            elections={[...elections, ...votedElections] as any} // Pass all elections for context
             onViewPosition={(electionId) => {
               console.log('View Position for election:', electionId);
               // Navigate to vote position page
@@ -1571,21 +1393,6 @@ const styles = StyleSheet.create({
   voteDetail: {
     fontSize: 14,
     color: '#374151',
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  emptyText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#9ca3af',
-    textAlign: 'center',
-    lineHeight: 24,
   },
   debugText: {
     marginTop: 8,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/store/auth-store';
+import BiometricVerificationModal from '@/components/biometric/BiometricVerificationModal';
+import { biometricService } from '@/lib/api/biometric-service';
 
 const { width, height } = Dimensions.get('window');
 
@@ -86,21 +88,23 @@ const getPartyLogo = (candidate: any) => {
   return null;
 };
 
-export const VotingModal: React.FC<VotingModalProps> = ({
+export const VotingModal = ({
   isOpen,
   onClose,
   election,
   voterInfo,
   onVoteSuccess,
-}) => {
+}: VotingModalProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(height));
+  const [showBiometricModal, setShowBiometricModal] = useState(false);
+  const [biometricVerified, setBiometricVerified] = useState(false);
   const { token } = useAuthStore();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -133,12 +137,78 @@ export const VotingModal: React.FC<VotingModalProps> = ({
   if (!isOpen) return null;
 
   const handleVoteSubmission = async () => {
-    if (!selectedCandidate || !election) return;
+    if (!selectedCandidate || !election) {
+      Alert.alert('Error', 'Please select a candidate before proceeding.');
+      return;
+    }
+
+    if (!token) {
+      Alert.alert('Authentication Error', 'You must be logged in to cast a vote.');
+      return;
+    }
+
+    // Check if biometric verification is required
+    try {
+      const biometricStatus = await biometricService.getBiometricStatus();
+      if (!biometricStatus.biometric_registered) {
+        Alert.alert(
+          'Biometric Required',
+          'You must register your fingerprint before voting. Please go to your profile to register your biometric.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+    } catch (error) {
+      console.error('❌ Error checking biometric status:', error);
+      Alert.alert(
+        'Biometric Check Failed',
+        'Unable to verify your biometric status. Please try again.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Show biometric verification modal
+    setShowBiometricModal(true);
+  };
+
+  const handleBiometricVerificationSuccess = async () => {
+    setBiometricVerified(true);
+    setShowBiometricModal(false);
+    
+    // Proceed with vote submission
+    await submitVote();
+  };
+
+  const submitVote = async () => {
+    if (!selectedCandidate || !election) {
+      Alert.alert('Error', 'Please select a candidate before proceeding.');
+      return;
+    }
+
+    if (!token) {
+      Alert.alert('Authentication Error', 'You must be logged in to cast a vote.');
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://172.20.10.2:3001/api'}/elections/${election.id}/vote`, {
+      console.log('🗳️ Starting vote submission:', {
+        electionId: election.id,
+        candidateId: selectedCandidate,
+        token: token ? 'Present' : 'Missing'
+      });
+
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.56.1:3001/api';
+      const voteUrl = `${apiUrl}/elections/${election.id}/vote`;
+      
+      console.log('🗳️ Voting API URL:', voteUrl);
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch(voteUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,25 +217,63 @@ export const VotingModal: React.FC<VotingModalProps> = ({
         body: JSON.stringify({
           candidate_id: selectedCandidate,
         }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
+
+      console.log('🗳️ Vote response status:', response.status);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to cast vote');
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('🗳️ Vote submission failed:', errorData);
+        throw new Error(errorData.message || `Failed to cast vote (${response.status})`);
       }
 
       const result = await response.json();
+      console.log('🗳️ Vote submission result:', result);
       
       if (result.success) {
-        Alert.alert('Success', 'Your vote has been cast successfully!');
-        onVoteSuccess?.();
-        onClose();
+        Alert.alert(
+          'Vote Cast Successfully! 🎉', 
+          'Your vote has been recorded and is being processed. Thank you for participating in the democratic process!',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                onVoteSuccess?.();
+                onClose();
+              }
+            }
+          ]
+        );
       } else {
         throw new Error(result.message || 'Vote submission failed');
       }
     } catch (error: any) {
-      console.error('Vote submission error:', error);
-      Alert.alert('Error', error.message || 'An error occurred while casting your vote');
+      console.error('🗳️ Vote submission error:', error);
+      
+      let errorMessage = 'An error occurred while casting your vote. Please try again.';
+      
+      if (error.name === 'AbortError') {
+        errorMessage = 'Vote submission timed out. Please check your internet connection and try again.';
+      } else if (error.message.includes('Network request failed')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.';
+      } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+        errorMessage = 'Your session has expired. Please log in again.';
+      } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+        errorMessage = 'You are not authorized to vote in this election.';
+      } else if (error.message.includes('409') || error.message.includes('Conflict')) {
+        errorMessage = 'You have already voted in this election.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert(
+        'Vote Submission Failed', 
+        errorMessage,
+        [{ text: 'OK' }]
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -218,6 +326,14 @@ export const VotingModal: React.FC<VotingModalProps> = ({
 
         {/* Content */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {isSubmitting && (
+            <View style={styles.loadingOverlay}>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3B82F6" />
+                <Text style={styles.loadingText}>Processing your vote...</Text>
+              </View>
+            </View>
+          )}
           {/* Step Header */}
           <View style={styles.stepHeader}>
             <View style={styles.stepIconContainer}>
@@ -313,6 +429,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                       styles.candidateCard,
                       selectedCandidate === candidate.id && styles.selectedCandidateCard
                     ]}
+                    activeOpacity={0.8}
                     onPress={() => setSelectedCandidate(candidate.id)}
                   >
                     {/* Party Logo at the top */}
@@ -322,7 +439,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                           source={getPartyLogo(candidate)}
                           style={styles.partyLogoLarge}
                           onLoad={() => console.log('✅ Party logo loaded successfully for:', candidate.name)}
-                          onError={(error) => {
+                          onError={(error: any) => {
                             console.log('❌ Party logo failed to load for:', candidate.name, 'Error:', error.nativeEvent.error);
                           }}
                         />
@@ -370,6 +487,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
               <View style={styles.selectionButtonRow}>
                 <TouchableOpacity 
                   style={styles.backButton}
+                  activeOpacity={0.8}
                   onPress={() => setCurrentStep(1)}
                 >
                   <Ionicons name="arrow-back" size={20} color="#6B7280" />
@@ -378,6 +496,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                 
                 <TouchableOpacity 
                   style={[styles.proceedButton, !selectedCandidate && styles.disabledButton]}
+                  activeOpacity={0.8}
                   onPress={() => setCurrentStep(3)}
                   disabled={!selectedCandidate}
                 >
@@ -411,7 +530,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                         )}
                         style={styles.confirmationPartyLogo}
                         onLoad={() => console.log('✅ Confirmation party logo loaded successfully')}
-                        onError={(error) => console.log('❌ Confirmation party logo failed to load. Error:', error.nativeEvent.error)}
+                        onError={(error: any) => console.log('❌ Confirmation party logo failed to load. Error:', error.nativeEvent.error)}
                       />
                     ) : (
                       <View style={[styles.confirmationPartyLogo, { 
@@ -443,6 +562,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
               <View style={styles.confirmationButtonRow}>
                 <TouchableOpacity 
                   style={styles.backButton}
+                  activeOpacity={0.8}
                   onPress={() => setCurrentStep(2)}
                 >
                   <Ionicons name="arrow-back" size={20} color="#6B7280" />
@@ -451,7 +571,17 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                 
                 <TouchableOpacity 
                   style={[styles.confirmVoteButton, isSubmitting && styles.disabledButton]}
-                  onPress={handleVoteSubmission}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    Alert.alert(
+                      'Confirm Your Vote',
+                      `Are you sure you want to vote for ${election?.contestants?.find((c: any) => c.id === selectedCandidate)?.name}? This action cannot be undone.`,
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Yes, Cast My Vote', onPress: handleVoteSubmission }
+                      ]
+                    );
+                  }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -460,7 +590,7 @@ export const VotingModal: React.FC<VotingModalProps> = ({
                     <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
                   )}
                   <Text style={styles.confirmVoteButtonText}>
-                    {isSubmitting ? 'Submitting Vote...' : 'Confirm & Cast Vote'}
+                    {isSubmitting ? 'Casting Your Vote...' : 'Cast My Vote'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -468,6 +598,17 @@ export const VotingModal: React.FC<VotingModalProps> = ({
           )}
         </ScrollView>
       </Animated.View>
+
+      {/* Biometric Verification Modal */}
+      {election && (
+        <BiometricVerificationModal
+          visible={showBiometricModal}
+          onClose={() => setShowBiometricModal(false)}
+          onSuccess={handleBiometricVerificationSuccess}
+          electionId={election.id}
+          electionTitle={election.title}
+        />
+      )}
     </Animated.View>
   );
 };
@@ -649,49 +790,65 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#3B82F6',
-    paddingVertical: 18,
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    borderRadius: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
+    minHeight: 60,
+    borderWidth: 2,
+    borderColor: '#2563EB',
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    marginHorizontal: 12,
+    textAlign: 'center',
+  },
+  secondaryButton: {
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 20,
     paddingHorizontal: 28,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  primaryButtonText: {
-    color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: '700',
-    marginHorizontal: 10,
-  },
-  secondaryButton: {
-    backgroundColor: '#F3F4F6',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     flex: 1,
     marginRight: 12,
+    minHeight: 60,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   secondaryButtonText: {
     color: '#6B7280',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    marginLeft: 10,
+    textAlign: 'center',
   },
   disabledButton: {
     backgroundColor: '#9CA3AF',
     shadowOpacity: 0,
     elevation: 0,
+    borderColor: '#6B7280',
+    opacity: 0.6,
   },
   buttonRow: {
     flexDirection: 'row',
-    marginTop: 24,
+    marginTop: 28,
+    gap: 16,
   },
   selectionButtonRow: {
     flexDirection: 'row',
@@ -969,14 +1126,14 @@ const styles = StyleSheet.create({
   },
   backButton: {
     backgroundColor: '#F3F4F6',
-    paddingVertical: 18,
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 16,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -986,53 +1143,83 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     color: '#6B7280',
-    fontSize: 17,
-    fontWeight: '700',
-    marginLeft: 10,
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   proceedButton: {
     backgroundColor: '#3B82F6',
-    paddingVertical: 18,
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 16,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     flex: 2,
     shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   proceedButtonText: {
     color: '#FFFFFF',
-    fontSize: 17,
-    fontWeight: '700',
-    marginRight: 10,
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 8,
     textAlign: 'center',
   },
   confirmVoteButton: {
     backgroundColor: '#10B981',
-    paddingVertical: 20,
-    paddingHorizontal: 28,
-    borderRadius: 16,
+    paddingVertical: 22,
+    paddingHorizontal: 32,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+    elevation: 16,
     borderWidth: 3,
     borderColor: '#059669',
+    minHeight: 64,
   },
   confirmVoteButtonText: {
     color: '#FFFFFF',
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 10,
+    marginLeft: 12,
+    textAlign: 'center',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loadingContainer: {
+    backgroundColor: '#FFFFFF',
+    padding: 30,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
     textAlign: 'center',
   },
 });

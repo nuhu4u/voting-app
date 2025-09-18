@@ -576,7 +576,18 @@ export default function RegisterPage() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => {
+              try {
+                router.replace('/(tabs)/elections');
+              } catch (error) {
+                console.log('Navigation error:', error);
+                // Fallback: try to navigate to elections
+                router.push('/(tabs)/elections');
+              }
+            }}
+          >
             <Ionicons name="arrow-back" size={20} color="#3b82f6" />
             <Text style={styles.backButtonText}>Back to Home</Text>
           </TouchableOpacity>
